@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Hastane Acil Servis</title>
+</head>
+
+<body>
+  <h1>Hastane Acil Servis Simülasyonu</h1>
+  <form action="/hasta-ekle" method="post">
+    <h2>Hasta Ekle</h2>
+    <label for="id">Hasta ID:</label><br>
+    <input type="number" id="id" name="id" required><br>
+    <label for="oncelik">Öncelik Seviyesi:</label><br>
+    <input type="number" id="oncelik" name="oncelik" min="1" max="10" required><br>
+    <label for="sure">Tedavi Süresi (dk):</label><br>
+    <input type="number" id="sure" name="sure" required><br><br>
+    <button type="submit">Ekle</button>
+  </form>
+  <form action="/simulasyon" method="post">
+    <h2>Tedavi Simülasyonu</h2>
+    <button type="submit">Simülasyonu Başlat</button>
+  </form>
+  {% if message %}
+  <p><strong>{{ message }}</strong></p>
+  {% endif %}
+  {% if rapor %}
+  <h2>Simülasyon Raporu</h2>
+  <h3>Tedavi Edilen Hastalar</h3>
+  <ul>
+    {% for hasta in rapor['Tedavi Edilen'] %}
+    <li>{{ hasta }}</li>
+    {% endfor %}
+  </ul>
+  <h3>Tedavi Edilemeyen Hastalar</h3>
+  <ul>
+    {% for hasta in rapor['Tedavi Edilemeyen'] %}
+    <li>{{ hasta }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</body>
+
+</html>
