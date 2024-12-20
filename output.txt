@@ -1,0 +1,15 @@
+Tedavi Edilen Hastalar:
+Hasta ID: 101, Öncelik: 1, Süre: 15 dakikalar
+Hasta ID: 104, Öncelik: 1, Süre: 60 dakikalar
+Hasta ID: 102, Öncelik: 3, Süre: 40 dakikalar
+Hasta ID: 105, Öncelik: 7, Süre: 15 dakikalar
+Hasta ID: 103, Öncelik: 8, Süre: 20 dakikalar
+Hasta ID: 106, Öncelik: 2, Süre: 50 dakikalar
+Hasta ID: 107, Öncelik: 4, Süre: 45 dakikalar
+Hasta ID: 110, Öncelik: 2, Süre: 30 dakikalar
+Hasta ID: 109, Öncelik: 3, Süre: 35 dakikalar
+Hasta ID: 107, Öncelik: 4, Süre: 45 dakikalar
+Hasta ID: 108, Öncelik: 6, Süre: 25 dakikalar
+Hasta ID: 111, Öncelik: 8, Süre: 10 dakikalar
+
+Tedavi Edilemeyen Hastalar:

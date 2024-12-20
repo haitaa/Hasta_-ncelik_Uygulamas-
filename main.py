@@ -14,9 +14,9 @@ class Hasta:
         self.sure = sure
 
     def __lt__(self, other):
-      if self.oncelik == other.oncelik:
-          return self.sure < other.sure  # Öncelik eşitse, süreye göre sıralama
-      return self.oncelik < other.oncelik  # Öncelik küçükse, önceki hasta seçilir
+        if self.oncelik == other.oncelik:
+            return self.sure < other.sure  # Öncelik eşitse, süreye göre sıralama
+        return self.oncelik < other.oncelik  # Öncelik küçükse, önceki hasta seçilir
 
 
 class HastaneAcilServis:
@@ -34,6 +34,10 @@ class HastaneAcilServis:
     def hasta_ekle(self, id, oncelik, sure):
         yeni_hasta = Hasta(id, oncelik, sure)
         heapq.heappush(self.heap, yeni_hasta)
+        
+        # Dosyaya da yeni hasta ekleme
+        with open("input.txt", "a") as file:
+            file.write(f"{yeni_hasta.id},{yeni_hasta.oncelik},{yeni_hasta.sure}\n")
 
     def tedavi_simulasyonu(self):
         while self.heap and self.toplam_sure + self.heap[0].sure <= self.gun_limit:
@@ -63,25 +67,53 @@ class HastaneAcilServis:
             "Tedavi Edilemeyen": tedavi_edilemeyenler,
         }
 
+    def dosya_giris(self, dosya_yolu):
+        try:
+            with open(dosya_yolu, "r") as file:
+                hastalar = []
+                for line in file.readlines():
+                    parts = line.strip().split(',')
+                    id, oncelik, sure = map(int, parts)
+                    hastalar.append(Hasta(id, oncelik, sure))
+                self.heap_olustur(hastalar)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Dosya okuma hatası: {str(e)}")
+
+    def dosya_cikis(self, dosya_yolu):
+        try:
+            with open(dosya_yolu, "w") as file:
+                file.write("Tedavi Edilen Hastalar:\n")
+                for hasta in self.tedavi_edilenler:
+                    file.write(f"Hasta ID: {hasta.id}, Öncelik: {hasta.oncelik}, Süre: {hasta.sure} dakikalar\n")
+                file.write("\nTedavi Edilemeyen Hastalar:\n")
+                for hasta in self.tedavi_edilemeyenler:
+                    file.write(f"Hasta ID: {hasta.id}, Öncelik: {hasta.oncelik}, Süre: {hasta.sure} dakikalar\n")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Dosya yazma hatası: {str(e)}")
+
+    def dosya_baslangic_verileri(self, dosya_yolu):
+        try:
+            with open(dosya_yolu, "w") as file:
+                baslangic_hastalar = [
+                    Hasta(101, 5, 30),
+                    Hasta(102, 3, 40),
+                    Hasta(103, 8, 20),
+                    Hasta(104, 1, 60),
+                    Hasta(105, 7, 15),
+                    Hasta(106, 2, 50),
+                    Hasta(107, 4, 45),
+                    Hasta(108, 6, 25),
+                    Hasta(109, 3, 35),
+                    Hasta(110, 2, 30),
+                    Hasta(111, 8, 10)
+                ]
+                for hasta in baslangic_hastalar:
+                    file.write(f"{hasta.id},{hasta.oncelik},{hasta.sure}\n")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Başlangıç verilerini dosyaya yazma hatası: {str(e)}")
+
 # Simülasyon sınıfı
 tedavi_servis = HastaneAcilServis()
-
-#Başlangıç hasta listesi
-baslangic_hastalar = [
-    Hasta(101, 5, 30),
-    Hasta(102, 3, 40),
-    Hasta(103, 8, 20),
-    Hasta(104, 1, 60),
-    Hasta(105, 7, 15),
-    Hasta(106, 2, 50),
-    Hasta(107, 4, 45),
-    Hasta(108, 6, 25),
-    Hasta(109, 3, 35),
-    Hasta(110, 2, 30),
-    Hasta(111, 8, 10)
-]
-
-tedavi_servis.heap_olustur(baslangic_hastalar)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -103,6 +135,7 @@ def simulasyon(request: Request):
     try:
         tedavi_servis.tedavi_simulasyonu()
         rapor = tedavi_servis.raporla()
+        tedavi_servis.dosya_cikis("output.txt")  # Simülasyon sonucu çıktıyı dosyaya yaz
         return templates.TemplateResponse("index.html", {"request": request, "rapor": rapor})
     except Exception as e:
         return templates.TemplateResponse("index.html", {"request": request, "message": f"Hata: {str(e)}"})
